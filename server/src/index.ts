@@ -3,6 +3,7 @@ import cors from 'cors'
 import client from './db'
 import deleteUser from './api/users/deleteUser'
 import insertSubmission from './api/submissions/insertSubmission'
+import { getSubmissions } from './api/submissions/getSubmissions'
 
 const app = express()
 
@@ -127,6 +128,7 @@ app.put('/users/:id', async (req: Request, res: Response) => {
 
 app.delete('/users/:id', deleteUser)
 app.post('/users/:userId/submissions/', insertSubmission)
+app.get('/users/:userId/submissions/', getSubmissions)
 
 app.listen(PORT, () => {
     console.log('Server Listening on PORT:', PORT)

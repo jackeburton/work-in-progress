@@ -6,10 +6,8 @@ export default async function insertSubmission(req: Request, res: Response) {
     const { userId } = req.params
     const { content } = req.body
 
-    if (userId === undefined) {
-        res.status(400).json({
-            message: 'Request must contain "userId" in body',
-        })
+    if (Number.isNaN(userId)) {
+        res.status(400).json({ message: 'User id must be an integer' })
     }
 
     if (content === undefined) {
