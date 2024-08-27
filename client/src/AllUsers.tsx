@@ -22,7 +22,7 @@ const fetchUsers = async () => {
 
 function AllUsers() {
     const { isPending, error, data } = useQuery({
-        queryKey: ['repoData'],
+        queryKey: ['fetchUsers'],
         queryFn: fetchUsers,
     })
 
