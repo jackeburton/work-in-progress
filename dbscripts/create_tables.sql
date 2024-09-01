@@ -6,13 +6,14 @@ CREATE TABLE users (
 
 CREATE TABLE submissions (
     id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id),
+    userId INT REFERENCES users(id),
+    created_at DATETIME DEFAULT GETDATE(),
     content TEXT
 );
 
 CREATE TABLE reviews (
     id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id),
-    submission_id INT REFERENCES submissions(id),
+    userId INT REFERENCES users(id),
+    submissionId INT REFERENCES submissions(id),
     content TEXT
 );

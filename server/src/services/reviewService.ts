@@ -36,3 +36,19 @@ export async function getReviewById(id: number): Promise<Review | null> {
         throw new Error('Database operation failed')
     }
 }
+
+export async function getReviewsBySubmissionId(id: number): Promise<Review[] | null> {
+    const queryString = 'SELECT * FROM reviews WHERE submission_id = ' + id
+    try {
+        const result = await client.query(queryString)
+        if (result.rows.length === 0) {
+            return null
+        } else {
+            const reviews = result.rows
+            return reviews.map((review) => new Review(review.user_id, review.submission_id, review.content, review.id))
+        }
+    } catch (error) {
+        console.error('Issue selecting from db', error)
+        throw new Error('Database operation failed')
+    }
+}
