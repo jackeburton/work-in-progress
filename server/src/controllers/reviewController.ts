@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { createReview, getReviewById } from '../services/reviewService'
+import { createReview, getReviewById, getReviewsBySubmissionId } from '../services/reviewService'
 export async function createReviewController(req: Request, res: Response) {
     const content = req.body.content
     const userIdStr = req.body.userId
@@ -33,11 +33,33 @@ export async function getReviewByIdController(req: Request, res: Response) {
 
     if (isNaN(reviewId)) {
         res.status(400).json({
-            message: 'reviewId must be an integer',
+            message: 'Review id must be an integer',
         })
     } else {
         try {
             const Review = await getReviewById(reviewId)
+            if (Review) {
+                res.status(200).json(Review)
+            } else {
+                res.status(404).json({ message: 'review not found' })
+            }
+        } catch (error) {
+            console.error('Error searching for review', error)
+            res.status(500).json({ message: 'internal server error' })
+        }
+    }
+}
+
+export async function getReviewsBySubmissionIdController(req: Request, res: Response) {
+    const submissionId = parseInt(req.params.id)
+
+    if (isNaN(submissionId)) {
+        res.status(400).json({
+            message: 'Submission id must be an integer',
+        })
+    } else {
+        try {
+            const Review = await getReviewsBySubmissionId(submissionId)
             if (Review) {
                 res.status(200).json(Review)
             } else {

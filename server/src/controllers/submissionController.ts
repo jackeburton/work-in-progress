@@ -1,5 +1,10 @@
 import { Request, Response } from 'express'
-import { createSubmission, getSubmissionById } from '../services/submissionService'
+import {
+    createSubmission,
+    getNewSubmissions,
+    getSubmissionById,
+    getSubmissionsByUserId,
+} from '../services/submissionService'
 export async function createSubmissionController(req: Request, res: Response) {
     const content = req.body.content
     const userIdStr = req.body.userId
@@ -44,5 +49,41 @@ export async function getSubmissionByIdController(req: Request, res: Response) {
             console.error('Error searching for submission', error)
             res.status(500).json({ message: 'internal server error' })
         }
+    }
+}
+
+export async function getSubmissionsByUserIdController(req: Request, res: Response) {
+    const userId = parseInt(req.params.id)
+    if (isNaN(userId)) {
+        res.status(400).json({
+            message: 'userId must be an integer',
+        })
+    } else {
+        try {
+            const submissions = await getSubmissionsByUserId(userId)
+            if (submissions) {
+                res.status(200).json(submissions)
+            } else {
+                res.status(404).json({ message: 'User has no submissions' })
+            }
+        } catch (error) {
+            console.error('Error searching for users submission', error)
+            res.status(500).json({ message: 'internal server error' })
+        }
+    }
+}
+
+export async function getNewSubmissionsController(req: Request, res: Response) {
+    try {
+        const dateTime = new Date(req.body.dateTime)
+        const submissions = await getNewSubmissions(dateTime)
+        if (submissions) {
+            res.status(200).json(submissions)
+        } else {
+            res.status(404).json({ message: 'No new submissions' })
+        }
+    } catch (error) {
+        console.error('Error searching for users submissions', error)
+        res.status(500).json({ message: 'internal server error' })
     }
 }
