@@ -1,12 +1,32 @@
 import client from './db'
 
-async function getMultiplyById<Type extends { fromData(data: any): Type }>(
+interface getInterface<T> {
+    tableName: string
+    fromData(data: any): T
+}
+
+export async function getSingleById<Type>(id: number, modelClass: getInterface<Type>): Promise<Type | null> {
+    const queryString = 'SELECT * FROM ' + modelClass.tableName + ' WHERE id = ' + id
+    try {
+        const result = await client.query(queryString)
+        if (result.rows.length === 0) {
+            return null
+        } else {
+            const item = result.rows[0]
+            return modelClass.fromData(item)
+        }
+    } catch (error) {
+        console.error('Issue selecting from db', error)
+        throw new Error('Database operation failed')
+    }
+}
+
+export async function getMultiplyById<Type>(
     id: number,
-    table: string,
     queryField: string,
-    modelClass: Type
+    modelClass: getInterface<Type>
 ): Promise<Type[] | null> {
-    const queryString = 'SELECT * FROM ' + table + ' WHERE ' + queryField + ' = ' + id
+    const queryString = 'SELECT * FROM ' + modelClass.tableName + ' WHERE ' + queryField + ' = ' + id
     try {
         const result = await client.query(queryString)
         if (result.rows.length === 0) {

@@ -1,5 +1,7 @@
 import client from '../db'
-import { User } from '../models/userModel'
+import { Review } from '../models/reviewModel'
+import { Submission, SubmissionsWithReviews } from '../models/submissionModel'
+import { User, UserInfo } from '../models/userModel'
 
 // take the User and insert into db
 export async function createUser(user: User): Promise<User> {
@@ -26,6 +28,37 @@ export async function getUserByEmail(email: string): Promise<User | null> {
             const user = result.rows[0]
             return new User(user.email, user.username, user.id)
         }
+    } catch (error) {
+        console.error('Issue selecting from db', error)
+        throw new Error('Database operation failed')
+    }
+}
+
+export async function loadUserInfoById(id: number): Promise<UserInfo | null> {
+    const userQueryString = "SELECT * FROM users WHERE id = '" + id + "'"
+    const submissionQueryString = "SELECT * FROM submissions WHERE userId = '" + id + "'"
+
+    try {
+        const userResult = await client.query(userQueryString)
+
+        if (userResult.rows.length === 0) {
+            return null
+        }
+        const submissionResult = await client.query(submissionQueryString)
+        const submissionsWithReviews: SubmissionsWithReviews[] = []
+        if (submissionResult.rows.length !== 0) {
+            for (const submission of submissionResult.rows) {
+                const reviewQueryString = "SELECT * FROM reviews WHERE submissionId = '" + submission.id + "'"
+                const reviewResult = await client.query(reviewQueryString)
+                submissionsWithReviews.push({ submission, reviews: reviewResult.rows })
+            }
+        }
+
+        const userInfo: UserInfo = {
+            User: userResult.rows[0],
+            SubmissionsWithReviews: submissionsWithReviews,
+        }
+        return userInfo
     } catch (error) {
         console.error('Issue selecting from db', error)
         throw new Error('Database operation failed')

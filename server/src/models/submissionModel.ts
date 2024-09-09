@@ -1,10 +1,12 @@
 import { Model } from './Model'
+import { Review } from './reviewModel'
 
 export class Submission extends Model {
     id?: number
     userId: number
     content: string
     createdAt?: Date
+    static tableName = 'submissions'
 
     constructor(userId: number, content: string, createdAt?: Date, id?: number) {
         super()
@@ -22,4 +24,9 @@ export class Submission extends Model {
     static fromData(data: any): Submission {
         return new Submission(data.userId, data.content, data.createdAt, data.id)
     }
+}
+
+export type SubmissionsWithReviews = {
+    submission: Submission
+    reviews: Review[]
 }
