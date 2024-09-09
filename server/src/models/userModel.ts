@@ -1,16 +1,20 @@
-import { Model } from './Model'
+import { SubmissionsWithReviews } from './submissionModel'
 
-export class User extends Model {
+export class User {
     id?: number
     email: string
     username: string
 
     constructor(email: string, username: string, id?: number) {
-        super()
         this.email = email
         this.username = username
         if (id) {
             this.id = id
         }
     }
+}
+
+export type UserInfo = {
+    User: User
+    SubmissionsWithReviews: SubmissionsWithReviews[] | null
 }

@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import {
     createSubmissionController,
-    getNewSubmissionsController,
     getSubmissionByIdController,
     getSubmissionsByUserIdController,
+    getSubmissionsNotByUserIdController,
 } from '../controllers/submissionController'
 
 const router = Router()
@@ -11,6 +11,6 @@ const router = Router()
 router.post('/submissions', createSubmissionController)
 router.get('/submissions/:id', getSubmissionByIdController)
 router.get('user/:id/submissions', getSubmissionsByUserIdController)
-router.get('/submissions', getNewSubmissionsController)
+router.get('/submissionsToReview/:id', getSubmissionsNotByUserIdController)
 
 export default router

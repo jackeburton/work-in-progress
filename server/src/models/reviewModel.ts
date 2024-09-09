@@ -5,6 +5,7 @@ export class Review extends Model {
     userId: number
     submissionId: number
     content: string
+    static tableName = 'reviews'
 
     constructor(userId: number, submissionId: number, content: string, id?: number) {
         super()
@@ -14,5 +15,8 @@ export class Review extends Model {
         if (id) {
             this.id = id
         }
+    }
+    static fromData(data: any): Review {
+        return new Review(data.userId, data.submissionId, data.content, data.id)
     }
 }

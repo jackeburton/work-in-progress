@@ -4,6 +4,7 @@ import {
     getNewSubmissions,
     getSubmissionById,
     getSubmissionsByUserId,
+    getSubmissionsNotByUserId,
 } from '../services/submissionService'
 export async function createSubmissionController(req: Request, res: Response) {
     const content = req.body.content
@@ -85,5 +86,26 @@ export async function getNewSubmissionsController(req: Request, res: Response) {
     } catch (error) {
         console.error('Error searching for users submissions', error)
         res.status(500).json({ message: 'internal server error' })
+    }
+}
+
+export async function getSubmissionsNotByUserIdController(req: Request, res: Response) {
+    const userId = parseInt(req.params.id)
+    if (isNaN(userId)) {
+        res.status(400).json({
+            message: 'userId must be an integer',
+        })
+    } else {
+        try {
+            const submissions = await getSubmissionsNotByUserId(userId)
+            if (submissions) {
+                res.status(200).json(submissions)
+            } else {
+                res.status(404).json({ message: 'No submissions found' })
+            }
+        } catch (error) {
+            console.error('Error searching for submissions', error)
+            res.status(500).json({ message: 'internal server error' })
+        }
     }
 }
