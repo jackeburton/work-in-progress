@@ -8,7 +8,7 @@ import {
 
 const router = Router()
 
-router.post('/submissions', createSubmissionController)
+router.post('/submit', createSubmissionController)
 router.get('/submissions/:id', getSubmissionByIdController)
 router.get('user/:id/submissions', getSubmissionsByUserIdController)
 router.get('/submissionsToReview/:id', getSubmissionsNotByUserIdController)

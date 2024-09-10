@@ -4,11 +4,11 @@ import { getMultiplyById, getSingleById } from '../utils'
 
 export async function createReview(review: Review): Promise<Review> {
     const queryString =
-        'INSERT INTO reviews (user_id, submission_id, content) VALUES (' +
+        'INSERT INTO reviews (userId, submissionId, content) VALUES (' +
         review.userId +
         ', ' +
         review.submissionId +
-        ', ' +
+        ", '" +
         review.content +
         "') RETURNING *"
 
@@ -17,6 +17,7 @@ export async function createReview(review: Review): Promise<Review> {
         const createReview = result.rows[0]
         return new Review(createReview.user_id, createReview.submission_id, createReview.content, createReview.id)
     } catch (error) {
+        console.log(queryString)
         console.error('Issue inserting into db', error)
         throw new Error('Database operation failed')
     }

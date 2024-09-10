@@ -4,7 +4,7 @@ import { getMultiplyById, getSingleById } from '../utils'
 
 export async function createSubmission(submission: Submission): Promise<Submission> {
     const queryString =
-        'INSERT INTO submissions (user_id, content) VALUES (' +
+        'INSERT INTO submissions (userId, content) VALUES (' +
         submission.userId +
         ", '" +
         submission.content +
