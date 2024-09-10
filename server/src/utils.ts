@@ -1,4 +1,18 @@
 import client from './db'
+import { Request, Response } from 'express'
+import jwt from 'jsonwebtoken'
+
+export const authenticateJWT = (req: Request, res: Response, next: Function) => {
+    const token = req.cookies.jwt
+
+    if (token == null) return res.sendStatus(401)
+
+    jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: Express.User | undefined) => {
+        if (err) return res.sendStatus(403)
+        req.user = user
+        next()
+    })
+}
 
 interface getInterface<T> {
     tableName: string

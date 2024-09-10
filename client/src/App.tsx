@@ -7,6 +7,8 @@ import SubmissionView from './SubmissionView'
 import ReviewView from './ReviewView'
 import SubmitView from './SubmitView'
 
+axios.defaults.withCredentials = true
+
 const fetchUserByEmail = async (userEmail: string | null) => {
     const response = await axios({
         method: 'get',
@@ -15,25 +17,24 @@ const fetchUserByEmail = async (userEmail: string | null) => {
             email: userEmail,
         },
     })
-    console.log(response)
     return response.data
 }
-const getUserInfoByData = async (user: User | null) => {
+const fetchUserDetails = async () => {
+    const response = await axios.get('http://localhost:3000/api/me')
+    return { id: response.data.userId, username: response.data.name, email: response.data.email } as User
+}
+const getUserInfoByData = async (user: User | undefined) => {
     const response = await axios({
         method: 'get',
         url: 'http://localhost:3000/api/user/' + user?.id,
     })
-    console.log('getting user data')
-    console.log(response)
     return response.data
 }
-const getSubmissionsToReview = async (user: User | null) => {
+const getSubmissionsToReview = async (user: User | undefined) => {
     const response = await axios({
         method: 'get',
         url: 'http://localhost:3000/api/submissionsToReview/' + user?.id,
     })
-    console.log('getting submission data')
-    console.log(response)
     return response.data
 }
 
@@ -44,8 +45,8 @@ export default function App() {
     const [submissionsWithReviews, setSubmissionsWithReviews] = useState<SubmissionWithReviews[] | null>(null)
     const [submissionsToReview, setSubmissionsToReview] = useState<Submission[] | null>(null)
     const { error, data, refetch } = useQuery({
-        queryKey: ['fetchUserByEmail'],
-        queryFn: () => fetchUserByEmail(userEmail),
+        queryKey: ['fetchUserDetails'],
+        queryFn: fetchUserDetails,
         enabled: false,
     })
     const {
@@ -76,7 +77,6 @@ export default function App() {
     }
 
     useEffect(() => {
-        console.log(data)
         if (data) {
             console.log(data)
             setLoggedInUser(data)
@@ -86,28 +86,21 @@ export default function App() {
     }, [data])
     useEffect(() => {
         if (loginData) {
-            console.log('login data present')
-            console.log(loggedInUser)
-            console.log(loginData)
             setSubmissionsWithReviews(loginData.SubmissionsWithReviews)
         }
     }, [loginData])
     useEffect(() => {
         if (submissionsData) {
-            console.log('submissions to reivew')
-            console.log(submissionsData)
             setSubmissionsToReview(submissionsData)
         }
     }, [submissionsData])
     useEffect(() => {
         if (error) {
-            console.log(error)
             const errorMessage =
                 axios.isAxiosError(error) && error.response ? error.response.data.message : 'An unknown error occurred'
             setLoginError(errorMessage)
         }
         if (loginDataError) {
-            console.log(loginDataError)
             const errorMessage =
                 axios.isAxiosError(loginDataError) && loginDataError.response
                     ? loginDataError.response.data.message
@@ -115,7 +108,6 @@ export default function App() {
             setLoginError(errorMessage)
         }
         if (submissionsDataError) {
-            console.log(submissionsDataError)
             const errorMessage =
                 axios.isAxiosError(submissionsDataError) && submissionsDataError.response
                     ? submissionsDataError.response.data.message
@@ -123,6 +115,9 @@ export default function App() {
             setLoginError(errorMessage)
         }
     }, [error, loginDataError, submissionsDataError])
+    useEffect(() => {
+        refetch()
+    }, [])
 
     if (loggedInUser && submissionsWithReviews && submissionsToReview) {
         return (
@@ -174,6 +169,20 @@ function Login({ handleLogin, handleUserUpdate, user, loginError }: LoginProps) 
             {loginError ? <div>{loginError}</div> : <div></div>}
             <input onChange={(e) => handleUserUpdate(e.target.value)} value={user ?? ''}></input>
             {user === null ? <div></div> : <button onClick={handleLogin}></button>}
+            <LoginGoogle></LoginGoogle>
+        </div>
+    )
+}
+
+const LoginGoogle = () => {
+    const googleLogin = () => {
+        window.open('http://localhost:3000/api/google', '_self')
+    }
+
+    return (
+        <div>
+            <h2>Login with Google</h2>
+            <button onClick={googleLogin}>Login with Google</button>
         </div>
     )
 }
