@@ -18,6 +18,17 @@ export type Review = {
     content: string
 }
 
+export type SubmittingReview = {
+    userId: number
+    submissionId: number
+    content: string
+}
+
+export type SubmittingSubmission = {
+    userId: number
+    content: string
+}
+
 export type SubmissionWithReviews = {
     submission: Submission
     reviews: Review[]

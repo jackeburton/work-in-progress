@@ -6,6 +6,7 @@ export async function createReviewController(req: Request, res: Response) {
     const submissionIdStr = req.body.submissionId
 
     if (content == undefined || userIdStr == undefined) {
+        console.log(req.body)
         res.status(400).json({
             message: 'Request must contain "content" and "userId" in body',
         })
@@ -14,6 +15,7 @@ export async function createReviewController(req: Request, res: Response) {
         const submissionId = parseInt(submissionIdStr)
 
         if (isNaN(userId) || isNaN(submissionId)) {
+            console.log(req.body)
             res.status(400).json({
                 message: 'userId, submissionId must be an integer',
             })

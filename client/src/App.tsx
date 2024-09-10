@@ -5,6 +5,7 @@ import { Routes, Route, Link } from 'react-router-dom'
 import { Submission, SubmissionWithReviews, User } from './types/UserInfo'
 import SubmissionView from './SubmissionView'
 import ReviewView from './ReviewView'
+import SubmitView from './SubmitView'
 
 const fetchUserByEmail = async (userEmail: string | null) => {
     const response = await axios({
@@ -127,12 +128,17 @@ export default function App() {
         return (
             <Routes>
                 <Route path="/" element={<LoggedIn />} />
-                <Route path="/submit" element={<div>todo</div>} />
+                <Route path="/submit" element={<SubmitView userId={loggedInUser.id}></SubmitView>} />
                 <Route
                     path="/submissions"
                     element={<SubmissionView submissionsWithReviews={submissionsWithReviews}></SubmissionView>}
                 />
-                <Route path="/review" element={<ReviewView submissionsToReview={submissionsToReview}></ReviewView>} />
+                <Route
+                    path="/review"
+                    element={
+                        <ReviewView userId={loggedInUser.id} submissionsToReview={submissionsToReview}></ReviewView>
+                    }
+                />
             </Routes>
         )
     }
@@ -140,7 +146,7 @@ export default function App() {
     return (
         <Routes>
             <Route
-                path="/"
+                path="/*"
                 element={
                     <Login
                         handleLogin={handleLogin}

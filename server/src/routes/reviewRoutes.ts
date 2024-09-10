@@ -7,7 +7,7 @@ import {
 
 const router = Router()
 
-router.post('/reviews', createReviewController)
+router.post('/review', createReviewController)
 router.get('/reviews/:id', getReviewByIdController)
 router.get('/submission/:id/reviews', getReviewsBySubmissionIdController)
 
