@@ -1,6 +1,9 @@
 import { Request, Response } from 'express'
 import { createUser, getUserByEmail, loadUserInfoById } from '../services/userService'
 import { UserInfo } from '../models/userModel'
+import jwt from 'jsonwebtoken'
+
+export async function loginUserController(req: Request, res: Response) {}
 
 export async function createUserController(req: Request, res: Response) {
     const { email, username } = req.body
