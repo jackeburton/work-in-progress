@@ -47,6 +47,12 @@ router.get(
 router.get('/me', authenticateJWT, (req, res) => {
     console.log('getting /me')
     if (req.user) {
+        // this sends the user back to the front end but we can also send the state needed which will be
+        //loadUserInfoById -> const userInfo: UserInfo = {
+        //    User,
+        //    SubmissionsWithReviews
+        //}
+        // and getSubmissionsNotByUserId -> Submission[]
         res.json(req.user)
     } else {
         res.status(401).json({ message: 'Unauthorized' })
