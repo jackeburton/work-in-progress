@@ -26,7 +26,7 @@ export class Submission extends Model {
     }
 }
 
-export type SubmissionsWithReviews = {
+export type SubmissionWithReviews = {
     submission: Submission
     reviews: Review[]
 }

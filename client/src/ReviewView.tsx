@@ -17,19 +17,23 @@ const submitReview = async (review: SubmittingReview) => {
     return response.data
 }
 
-type ReviewViewProps = { submissionsToReview: Submission[]; userId: number }
+type ReviewViewProps = { submissionsToReview: Submission[] | null; userId: number }
 function ReviewView({ submissionsToReview, userId }: ReviewViewProps) {
-    return (
-        <div>
-            {submissionsToReview.map((submission) => (
-                <SubmissionReview
-                    key={submission.id}
-                    submissionToReview={submission}
-                    userId={userId}
-                ></SubmissionReview>
-            ))}
-        </div>
-    )
+    if (submissionsToReview === null) {
+        return <div>you have no new submissions to review</div>
+    } else {
+        return (
+            <div>
+                {submissionsToReview.map((submission) => (
+                    <SubmissionReview
+                        key={submission.id}
+                        submissionToReview={submission}
+                        userId={userId}
+                    ></SubmissionReview>
+                ))}
+            </div>
+        )
+    }
 }
 
 export default ReviewView

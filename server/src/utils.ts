@@ -1,15 +1,26 @@
 import client from './db'
 import { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
+import { User } from './models/userModel'
+
+export const generateToken = (user: User) => {
+    const payload = {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+    } as User
+    return jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: '1h' })
+}
 
 export const authenticateJWT = (req: Request, res: Response, next: Function) => {
     const token = req.cookies.jwt
 
     if (token == null) return res.sendStatus(401)
 
-    jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: Express.User | undefined) => {
+    jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: any) => {
         if (err) return res.sendStatus(403)
-        req.user = user
+        console.log(user)
+        req.user = user as User
         next()
     })
 }

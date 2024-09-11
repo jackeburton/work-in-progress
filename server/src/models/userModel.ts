@@ -1,4 +1,4 @@
-import { SubmissionsWithReviews } from './submissionModel'
+import { SubmissionWithReviews } from './submissionModel'
 
 export class User {
     id?: number
@@ -15,6 +15,6 @@ export class User {
 }
 
 export type UserInfo = {
-    User: User
-    SubmissionsWithReviews: SubmissionsWithReviews[] | null
+    user: User
+    submissionsWithReviews: SubmissionWithReviews[] | null
 }
