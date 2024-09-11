@@ -1,19 +1,12 @@
+import { Request, Response } from 'express'
 import passport from 'passport'
 import { Router } from 'express'
 import jwt from 'jsonwebtoken'
 import { User } from '../models/userModel'
-import { authenticateJWT } from '../utils'
+import { authenticateJWT, generateToken } from '../utils'
+import { getLoginPayloadController } from '../controllers/loginController'
 
 const router = Router()
-
-const generateToken = (user: User) => {
-    const payload = {
-        userId: user.id,
-        email: user.email,
-        name: user.username,
-    }
-    return jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: '1h' })
-}
 
 router.get(
     '/google',
@@ -58,4 +51,6 @@ router.get('/me', authenticateJWT, (req, res) => {
         res.status(401).json({ message: 'Unauthorized' })
     }
 })
+
+router.get('/newme', authenticateJWT, getLoginPayloadController)
 export default router

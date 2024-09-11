@@ -36,5 +36,11 @@ export type SubmissionWithReviews = {
 
 export type UserInfo = {
     User: User
-    SubmissionsWithReviews: SubmissionsWithReviews[] | null
+    SubmissionsWithReviews: SubmissionWithReviews[] | null
+}
+
+export type LoginPayload = {
+    user: User
+    submissionsWithReviews: SubmissionWithReviews[] | null
+    submissionsToReview: Submission[] | null
 }

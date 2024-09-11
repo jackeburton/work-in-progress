@@ -1,9 +1,11 @@
 import { Review, SubmissionWithReviews } from './types/UserInfo'
 
-type SubmissionsProps = { submissionsWithReviews: SubmissionWithReviews[] }
+type SubmissionsProps = { submissionsWithReviews: SubmissionWithReviews[] | null }
 function SubmissionsView({ submissionsWithReviews }: SubmissionsProps) {
     console.log(submissionsWithReviews)
-    if (submissionsWithReviews) {
+    if (submissionsWithReviews === null) {
+        ;<div>you have no submissions with reivews</div>
+    } else {
         return (
             <div>
                 {submissionsWithReviews.map((submissionWithReviews: SubmissionWithReviews) => {
