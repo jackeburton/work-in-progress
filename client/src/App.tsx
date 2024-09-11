@@ -39,23 +39,26 @@ export default function App() {
     } else if (loginPayload) {
         return (
             <Routes>
-                <Route path="/" element={<LoggedIn />} />
-                <Route path="/submit" element={<SubmitView userId={loginPayload.user.id}></SubmitView>} />
-                <Route
-                    path="/submissions"
-                    element={
-                        <SubmissionView submissionsWithReviews={loginPayload.submissionsWithReviews}></SubmissionView>
-                    }
-                />
-                <Route
-                    path="/review"
-                    element={
-                        <ReviewView
-                            userId={loginPayload.user.id}
-                            submissionsToReview={loginPayload.submissionsToReview}
-                        ></ReviewView>
-                    }
-                />
+                <Route path="/" element={<LoggedIn />}>
+                    <Route path="/submit" element={<SubmitView userId={loginPayload.user.id}></SubmitView>} />
+                    <Route
+                        path="/submissions"
+                        element={
+                            <SubmissionView
+                                submissionsWithReviews={loginPayload.submissionsWithReviews}
+                            ></SubmissionView>
+                        }
+                    />
+                    <Route
+                        path="/review"
+                        element={
+                            <ReviewView
+                                userId={loginPayload.user.id}
+                                submissionsToReview={loginPayload.submissionsToReview}
+                            ></ReviewView>
+                        }
+                    />
+                </Route>
             </Routes>
         )
     } else

@@ -32,7 +32,7 @@ router.get(
                 secure: process.env.NODE_ENV === 'production', // Set to true in production
                 sameSite: 'strict',
             })
-            res.redirect('http://localhost:5173/') // Redirect to frontend after successful login
+            res.redirect('http://localhost:5173/submit') // Redirect to frontend after successful login
         }
     }
 )
