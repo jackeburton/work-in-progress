@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Submission, SubmittingReview } from './types/UserInfo'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
+import Draggable from 'react-draggable' // The default
 
 const submitReview = async (review: SubmittingReview) => {
     const response = await axios({
@@ -40,6 +41,7 @@ export default ReviewView
 
 type SubmissionReviewProps = { submissionToReview: Submission; userId: number }
 function SubmissionReview({ submissionToReview, userId }: SubmissionReviewProps) {
+    const nodeRef = useRef(null)
     const [reviewSent, setReviewSent] = useState(false)
     const [review, setReview] = useState<SubmittingReview>({ userId, content: '', submissionId: submissionToReview.id })
     const { error, data, refetch } = useQuery({
@@ -59,16 +61,18 @@ function SubmissionReview({ submissionToReview, userId }: SubmissionReviewProps)
     }
 
     return (
-        <div>
-            <div>{submissionToReview.content}</div>
-            <textarea
-                disabled={reviewSent}
-                value={review.content}
-                onChange={(e) => setReview({ ...review, content: e.target.value })}
-            />
-            <button disabled={reviewSent} onClick={() => refetch()}>
-                Submit review
-            </button>
-        </div>
+        <Draggable nodeRef={nodeRef}>
+            <div className="border-4 w-96" ref={nodeRef}>
+                <h1>{submissionToReview.content}</h1>
+                <textarea
+                    disabled={reviewSent}
+                    value={review.content}
+                    onChange={(e) => setReview({ ...review, content: e.target.value })}
+                />
+                <button disabled={reviewSent} onClick={() => refetch()}>
+                    Submit review
+                </button>
+            </div>
+        </Draggable>
     )
 }
