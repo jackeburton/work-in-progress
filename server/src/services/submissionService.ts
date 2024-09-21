@@ -3,15 +3,9 @@ import { Submission } from '../models/submissionModel'
 import { getMultiplyById, getSingleById } from '../utils'
 
 export async function createSubmission(submission: Submission): Promise<Submission> {
-    const queryString =
-        'INSERT INTO submissions (userId, content) VALUES (' +
-        submission.userId +
-        ", '" +
-        submission.content +
-        "') RETURNING *"
-
+    const queryString = 'INSERT INTO submissions (userId, content) VALUES ($1, $2) RETURNING *'
     try {
-        const result = await client.query(queryString)
+        const result = await client.query(queryString, [submission.userId, submission.content])
         const createSubmission = result.rows[0]
         return new Submission(createSubmission.user_id, createSubmission.content, createSubmission.id)
     } catch (error) {
@@ -29,9 +23,9 @@ export async function getSubmissionsByUserId(id: number): Promise<Submission[] |
 }
 
 export async function getNewSubmissions(dateTime: Date): Promise<Submission[] | null> {
-    const queryString = 'SELECT * FROM submissions WHERE created_at > ' + dateTime
+    const queryString = 'SELECT * FROM submissions WHERE created_at > $1'
     try {
-        const result = await client.query(queryString)
+        const result = await client.query(queryString, [dateTime])
         if (result.rows.length === 0) {
             return null
         } else {
@@ -48,19 +42,17 @@ export async function getNewSubmissions(dateTime: Date): Promise<Submission[] | 
 }
 
 export async function getSubmissionsNotByUserId(id: number): Promise<Submission[] | null> {
-    const submissionQueryString = 'SELECT * FROM submissions WHERE userId != ' + id
-    console.log(submissionQueryString)
+    const submissionQueryString = 'SELECT * FROM submissions WHERE userId != $1'
     try {
-        const result = await client.query(submissionQueryString)
+        const result = await client.query(submissionQueryString, [id])
         if (result.rows.length === 0) {
             return null
         } else {
             const submissionsWithReviewCount = await Promise.all(
                 result.rows.map(async (submission) => {
-                    const reviewQueryString =
-                        'SELECT COUNT(*) AS reviewcount FROM reviews WHERE submissionId = ' + submission.id
+                    const reviewQueryString = 'SELECT COUNT(*) AS reviewcount FROM reviews WHERE submissionId = $1'
 
-                    const result = await client.query(reviewQueryString)
+                    const result = await client.query(reviewQueryString, [submission.id])
 
                     return { ...submission, reviewCount: Number(result.rows[0].reviewcount) }
                 })
