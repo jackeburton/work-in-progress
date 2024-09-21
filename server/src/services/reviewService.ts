@@ -3,17 +3,10 @@ import { Review } from '../models/reviewModel'
 import { getMultiplyById, getSingleById } from '../utils'
 
 export async function createReview(review: Review): Promise<Review> {
-    const queryString =
-        'INSERT INTO reviews (userId, submissionId, content) VALUES (' +
-        review.userId +
-        ', ' +
-        review.submissionId +
-        ", '" +
-        review.content +
-        "') RETURNING *"
+    const queryString = 'INSERT INTO reviews (userId, submissionId, content) VALUES ($1, $2, $3) RETURNING *'
 
     try {
-        const result = await client.query(queryString)
+        const result = await client.query(queryString, [review.userId, review.submissionId, review.content])
         const createReview = result.rows[0]
         return new Review(createReview.user_id, createReview.submission_id, createReview.content, createReview.id)
     } catch (error) {

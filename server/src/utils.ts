@@ -31,9 +31,9 @@ interface getInterface<T> {
 }
 
 export async function getSingleById<Type>(id: number, modelClass: getInterface<Type>): Promise<Type | null> {
-    const queryString = 'SELECT * FROM ' + modelClass.tableName + ' WHERE id = ' + id
+    const queryString = 'SELECT * FROM $1 WHERE id = $2'
     try {
-        const result = await client.query(queryString)
+        const result = await client.query(queryString, [modelClass.tableName, id])
         if (result.rows.length === 0) {
             return null
         } else {
@@ -51,9 +51,9 @@ export async function getMultiplyById<Type>(
     queryField: string,
     modelClass: getInterface<Type>
 ): Promise<Type[] | null> {
-    const queryString = 'SELECT * FROM ' + modelClass.tableName + ' WHERE ' + queryField + ' = ' + id
+    const queryString = 'SELECT * FROM $1 WHERE $2 = $3'
     try {
-        const result = await client.query(queryString)
+        const result = await client.query(queryString, [modelClass.tableName, queryField, id])
         if (result.rows.length === 0) {
             return null
         } else {
