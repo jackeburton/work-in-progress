@@ -44,3 +44,9 @@ export type LoginPayload = {
     submissionsWithReviews: SubmissionWithReviews[] | null
     submissionsToReview: Submission[] | null
 }
+
+export type ReviewCard = Submission & {
+    reviewContent: string
+    reviewSent: boolean
+    selected: boolean
+}
