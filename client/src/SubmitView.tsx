@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { SubmittingSubmission } from './types/UserInfo'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
+import { useLogin } from './LoginContext'
 
 const submit = async (submission: SubmittingSubmission) => {
     const response = await axios({
@@ -16,10 +17,10 @@ const submit = async (submission: SubmittingSubmission) => {
     return response.data
 }
 
-type SubmitviewProps = { userId: number }
-function SubmitView({ userId }: SubmitviewProps) {
+function SubmitView() {
+    const { user } = useLogin()
     const [submissionSent, setSubmissionSent] = useState(false)
-    const [submission, setSubmission] = useState<SubmittingSubmission>({ userId: userId, content: '' })
+    const [submission, setSubmission] = useState<SubmittingSubmission>({ userId: user.id, content: '' })
     const { error, data, refetch } = useQuery({
         queryKey: ['submit'],
         queryFn: () => submit(submission),

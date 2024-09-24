@@ -1,8 +1,8 @@
+import { useLogin } from './LoginContext'
 import { Review, SubmissionWithReviews } from './types/UserInfo'
 
-type SubmissionsProps = { submissionsWithReviews: SubmissionWithReviews[] | null }
-function SubmissionsView({ submissionsWithReviews }: SubmissionsProps) {
-    console.log(submissionsWithReviews)
+function SubmissionsView() {
+    const { submissionsWithReviews } = useLogin()
     if (submissionsWithReviews === null) {
         ;<div>you have no submissions with reivews</div>
     } else {

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { ReviewCard, Submission, SubmittingReview } from './types/UserInfo'
+import { ReviewCard, SubmittingReview } from './types/UserInfo'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
 import Draggable from 'react-draggable'
 import { colours } from './types/Colours'
+import { useLogin } from './LoginContext'
 
 const submitReview = async (review: SubmittingReview) => {
     const response = await axios({
@@ -34,8 +35,8 @@ const reviewCoords = [
     { x: 250 + getOffset(), y: 300 + getOffset() },
 ]
 
-type ReviewViewProps = { submissionsToReview: Submission[] | null; userId: number }
-function ReviewView({ submissionsToReview, userId }: ReviewViewProps) {
+function ReviewView() {
+    const { submissionsToReview, user } = useLogin()
     if (submissionsToReview === null) {
         return <div>you have no new submissions to review</div>
     }
@@ -72,7 +73,7 @@ function ReviewView({ submissionsToReview, userId }: ReviewViewProps) {
                     reviewCard={submission}
                     coords={reviewCoords[index]}
                     anySelected={reviewCards.some((reviewCard) => reviewCard.selected)}
-                    userId={userId}
+                    userId={user.id}
                     clickOutsideCallback={() => {
                         setReviewCards(reviewCards.map((reviewCard) => ({ ...reviewCard, selected: false })))
                     }}
