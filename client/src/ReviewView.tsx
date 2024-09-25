@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
-import { ReviewCard, Submission, SubmittingReview } from './types/UserInfo'
+import { useEffect, useRef } from 'react'
+import { ReviewCard, SubmittingReview } from './types/UserInfo'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
 import Draggable from 'react-draggable'
 import { colours } from './types/Colours'
+import { useLogin } from './LoginContext'
+import { useReviewCards } from './useReviewCards'
 
 const submitReview = async (review: SubmittingReview) => {
     const response = await axios({
@@ -34,54 +36,29 @@ const reviewCoords = [
     { x: 250 + getOffset(), y: 300 + getOffset() },
 ]
 
-type ReviewViewProps = { submissionsToReview: Submission[] | null; userId: number }
-function ReviewView({ submissionsToReview, userId }: ReviewViewProps) {
+function ReviewView() {
+    const { submissionsToReview, user } = useLogin()
     if (submissionsToReview === null) {
         return <div>you have no new submissions to review</div>
     }
-    const [reviewCards, setReviewCards] = useState<ReviewCard[]>(
-        submissionsToReview.map((submission) => ({
-            ...submission,
-            reviewContent: '',
-            reviewSent: false,
-            selected: false,
-        }))
-    )
-
-    const updateReviewCards = (index: number, updates: Partial<ReviewCard>) => {
-        setReviewCards((prevCards) =>
-            prevCards.map((reviewCard, innerIndex) =>
-                innerIndex === index ? { ...reviewCard, ...updates } : reviewCard
-            )
-        )
-    }
-
-    const handleSelected = (index: number) => {
-        setReviewCards((prevCards) =>
-            prevCards.map((reviewCard, innerIndex) =>
-                innerIndex === index ? { ...reviewCard, selected: true } : { ...reviewCard, selected: false }
-            )
-        )
-    }
+    const { reviewCards, updateIndex, setIndexSelected, setNoneSelected } = useReviewCards(submissionsToReview)
 
     return (
         <div>
             {reviewCards.map((submission, index) => (
-                <SubmissionReviewNew
+                <SubmissionReview
                     key={index}
                     reviewCard={submission}
                     coords={reviewCoords[index]}
                     anySelected={reviewCards.some((reviewCard) => reviewCard.selected)}
-                    userId={userId}
-                    clickOutsideCallback={() => {
-                        setReviewCards(reviewCards.map((reviewCard) => ({ ...reviewCard, selected: false })))
-                    }}
-                    handleSelected={() => handleSelected(index)}
+                    userId={user.id}
+                    clickOutsideCallback={setNoneSelected}
+                    handleSelected={() => setIndexSelected(index)}
                     handleReviewUpdate={(reviewContent: string) => {
-                        updateReviewCards(index, { reviewContent })
+                        updateIndex(index, { reviewContent })
                     }}
                     handleReviewSentUpdate={() => {
-                        updateReviewCards(index, { reviewSent: true })
+                        updateIndex(index, { reviewSent: true })
                     }}
                 />
             ))}
@@ -100,7 +77,7 @@ type SubmissionReviewNewProps = {
     handleReviewUpdate: (reviewContent: string) => void
     handleReviewSentUpdate: () => void
 }
-function SubmissionReviewNew({
+function SubmissionReview({
     userId,
     reviewCard,
     coords,
@@ -116,7 +93,6 @@ function SubmissionReviewNew({
         queryFn: () => submitReview({ userId, submissionId: reviewCard.id, content: reviewCard.content }),
         enabled: false,
     })
-    const nodeRef = useRef(null)
     const backgroundColour = randomColour(reviewCard.id)
     useEffect(() => {
         if (data) {
@@ -163,14 +139,33 @@ function SubmissionReviewNew({
             )
         }
     } else {
-        const style = { width: '350px', backgroundColor: backgroundColour }
         return (
-            <Draggable nodeRef={nodeRef} defaultPosition={coords}>
-                <div ref={nodeRef} style={style}>
-                    <div>{reviewCard.content}</div>
-                    <div onClick={() => handleSelected()}>EXPAND</div>
-                </div>
-            </Draggable>
+            <DraggableCard
+                backgroundColour={backgroundColour}
+                defaultPosision={coords}
+                content={reviewCard.content}
+                handleSelected={handleSelected}
+            />
         )
     }
+}
+
+type DraggableCardProps = {
+    backgroundColour: string
+    defaultPosision: { x: number; y: number }
+    content: string
+    handleSelected: () => void
+}
+
+function DraggableCard({ backgroundColour, defaultPosision, content, handleSelected }: DraggableCardProps) {
+    const nodeRef = useRef(null)
+    const style = { width: '350px', backgroundColor: backgroundColour }
+    return (
+        <Draggable nodeRef={nodeRef} defaultPosition={defaultPosision}>
+            <div ref={nodeRef} style={style}>
+                <div>{content}</div>
+                <div onClick={() => handleSelected()}>EXPAND</div>
+            </div>
+        </Draggable>
+    )
 }
