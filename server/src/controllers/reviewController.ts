@@ -1,12 +1,11 @@
 import { Request, Response } from 'express'
 import { createReview, getReviewById, getReviewsBySubmissionId } from '../services/reviewService'
 export async function createReviewController(req: Request, res: Response) {
-    const content = req.body.content
+    const reviewSections = req.body.reviewSections
     const userIdStr = req.body.userId
     const submissionIdStr = req.body.submissionId
 
-    if (content == undefined || userIdStr == undefined) {
-        console.log(req.body)
+    if (reviewSections == undefined || userIdStr == undefined) {
         res.status(400).json({
             message: 'Request must contain "content" and "userId" in body',
         })
@@ -15,13 +14,12 @@ export async function createReviewController(req: Request, res: Response) {
         const submissionId = parseInt(submissionIdStr)
 
         if (isNaN(userId) || isNaN(submissionId)) {
-            console.log(req.body)
             res.status(400).json({
                 message: 'userId, submissionId must be an integer',
             })
         } else {
             try {
-                const newReview = await createReview({ userId, submissionId, content })
+                const newReview = await createReview({ userId, submissionId, reviewSections })
                 res.status(200).json(newReview)
             } catch (error) {
                 console.error('Error creating review', error)

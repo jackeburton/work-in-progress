@@ -29,5 +29,6 @@ export const useLogin = () => {
     if (!context) {
         throw new Error('only to be used when user is guaranteed to be logged in')
     }
+    console.log(context)
     return context
 }

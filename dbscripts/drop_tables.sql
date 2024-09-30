@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS reviewSections;
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS submissions;
 DROP TABLE IF EXISTS users;

@@ -62,7 +62,6 @@ export async function getSubmissionsNotByUserId(id: number): Promise<Submission[
                 .sort((a, b) => b.reviewCount - a.reviewCount)
                 .slice(0, 3)
                 .map((submission) => {
-                    console.log(submission)
                     return new Submission(submission.user_id, submission.content, submission.created_at, submission.id)
                 })
         }
