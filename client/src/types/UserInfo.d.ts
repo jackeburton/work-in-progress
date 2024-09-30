@@ -55,3 +55,5 @@ export type ReviewCard = Submission & {
     reviewSent: boolean
     selected: boolean
 }
+
+type HeaderProps = {}
