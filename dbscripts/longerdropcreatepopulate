@@ -1,0 +1,8 @@
+#!/bin/bash 
+
+echo "DROPPING TABLES"
+psql -d mydb -a -f drop_tables.sql 
+echo "CREATING TABLES"
+psql -d mydb -a -f create_tables.sql 
+echo "POPULATING TABLES"
+psql -d mydb -a -f populate_tables_longer_data.sql 

@@ -1,0 +1,7 @@
+.react-draggable {
+    box-shadow: 10px 10px 5px;
+}
+
+.react-draggable-dragging {
+    box-shadow: 15px 15px 5px;
+}
