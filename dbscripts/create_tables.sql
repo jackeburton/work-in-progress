@@ -14,6 +14,12 @@ CREATE TABLE submissions (
 CREATE TABLE reviews (
     id SERIAL PRIMARY KEY,
     userId INT REFERENCES users(id),
-    submissionId INT REFERENCES submissions(id),
+    submissionId INT REFERENCES submissions(id)
+);
+
+CREATE TABLE reviewSections (
+    id SERIAL PRIMARY KEY,
+    reviewId INT REFERENCES reviews(id),
+    quote TEXT,
     content TEXT
 );

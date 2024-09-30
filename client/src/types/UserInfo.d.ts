@@ -21,6 +21,11 @@ export type Review = {
 export type SubmittingReview = {
     userId: number
     submissionId: number
+    reviewSections: ReviewSection[]
+}
+
+export type ReviewSection = {
+    quote: string
     content: string
 }
 

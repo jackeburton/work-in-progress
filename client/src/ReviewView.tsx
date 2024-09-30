@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ReviewCard, SubmittingReview } from './types/UserInfo'
+import { ReviewCard, ReviewSection, SubmittingReview } from './types/UserInfo'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
 import Draggable from 'react-draggable'
@@ -9,13 +9,14 @@ import { useReviewCards } from './useReviewCards'
 import './reviewViewStyle.css'
 
 const submitReview = async (review: SubmittingReview) => {
+    console.log(review)
     const response = await axios({
         method: 'post',
         url: 'http://localhost:3000/api/review',
         data: {
             userId: review.userId,
             submissionId: review.submissionId,
-            content: review.content,
+            reviewSections: review.reviewSections,
         },
     })
     return response.data
@@ -42,27 +43,30 @@ function ReviewView() {
     if (submissionsToReview === null) {
         return <div>you have no new submissions to review</div>
     }
-    const { reviewCards, updateIndex, setIndexSelected, setNoneSelected } = useReviewCards(submissionsToReview)
+    const { reviewCards, removeId, setIdSelected, setNoneSelected } = useReviewCards(submissionsToReview)
+
+    useEffect(() => {
+        console.log(reviewCards)
+    }, [reviewCards])
 
     return (
         <div>
-            {reviewCards.map((submission, index) => (
-                <SubmissionReview
-                    key={index}
-                    reviewCard={submission}
-                    coords={reviewCoords[index]}
-                    anySelected={reviewCards.some((reviewCard) => reviewCard.selected)}
-                    userId={user.id}
-                    clickOutsideCallback={setNoneSelected}
-                    handleSelected={() => setIndexSelected(index)}
-                    handleReviewUpdate={(reviewContent: string) => {
-                        updateIndex(index, { reviewContent })
-                    }}
-                    handleReviewSentUpdate={() => {
-                        updateIndex(index, { reviewSent: true })
-                    }}
-                />
-            ))}
+            {reviewCards
+                .filter((submission) => submission.reviewSent === false)
+                .map((submission, index) => (
+                    <SubmissionReview
+                        key={submission.id}
+                        reviewCard={submission}
+                        coords={reviewCoords[index]}
+                        anySelected={reviewCards.some((reviewCard) => reviewCard.selected)}
+                        userId={user.id}
+                        handleDeselectAll={setNoneSelected}
+                        handleSelected={() => setIdSelected(submission.id)}
+                        handleReviewSentUpdate={() => {
+                            removeId(submission.id)
+                        }}
+                    />
+                ))}
         </div>
     )
 }
@@ -74,8 +78,7 @@ type SubmissionReviewNewProps = {
     coords: { x: number; y: number }
     anySelected: boolean
     handleSelected: () => void
-    clickOutsideCallback: () => void
-    handleReviewUpdate: (reviewContent: string) => void
+    handleDeselectAll: () => void
     handleReviewSentUpdate: () => void
 }
 function SubmissionReview({
@@ -84,23 +87,29 @@ function SubmissionReview({
     coords,
     anySelected,
     handleSelected,
-    clickOutsideCallback,
-    handleReviewUpdate,
+    handleDeselectAll,
     handleReviewSentUpdate,
 }: SubmissionReviewNewProps) {
     const divRef = useRef<HTMLDivElement | null>(null)
     const { data, refetch } = useQuery({
         queryKey: ['submitReview', reviewCard.id],
-        queryFn: () => submitReview({ userId, submissionId: reviewCard.id, content: reviewCard.content }),
+        queryFn: () =>
+            submitReview({
+                userId: userId,
+                submissionId: reviewCard.id,
+                reviewSections: reviewSections,
+            } as SubmittingReview),
         enabled: false,
     })
     const backgroundColour = randomColour(reviewCard.id)
     const [highlighted, setHighlighted] = useState<null | string>(null)
     const [currentReview, setCurrentReview] = useState<string>('')
-    const [reviewSections, setReviewSections] = useState<{ quote: string; reviewContent: string }[]>()
+    const [reviewSections, setReviewSections] = useState<ReviewSection[]>([])
     useEffect(() => {
         if (data) {
+            console.log('sent')
             handleReviewSentUpdate()
+            handleDeselectAll()
         }
     }, [data])
     useEffect(() => {
@@ -114,7 +123,7 @@ function SubmissionReview({
         const target = event.target as HTMLElement
         const clickedOnIgnoredElement = target.closest('.ignore-click')
         if (divRef.current && !divRef.current.contains(target) && !clickedOnIgnoredElement) {
-            clickOutsideCallback()
+            handleDeselectAll()
         }
     }
 
@@ -137,11 +146,11 @@ function SubmissionReview({
     const handleSubmitReview = () => {
         if (highlighted !== null) {
             if (reviewSections !== undefined) {
-                setReviewSections([...reviewSections, { quote: highlighted, reviewContent: currentReview }])
+                setReviewSections([...reviewSections, { quote: highlighted, content: currentReview }])
                 setHighlighted(null)
                 setCurrentReview('')
             } else {
-                setReviewSections([{ quote: highlighted, reviewContent: currentReview }])
+                setReviewSections([{ quote: highlighted, content: currentReview }])
                 setHighlighted(null)
                 setCurrentReview('')
             }
@@ -152,6 +161,10 @@ function SubmissionReview({
         if (reviewSections) {
             setReviewSections(reviewSections.filter((_, innerIndex) => index !== innerIndex))
         }
+    }
+
+    const handleSubmit = () => {
+        refetch()
     }
 
     if (anySelected) {
@@ -175,13 +188,14 @@ function SubmissionReview({
                                 padding: '0px 30px 0px',
                                 textIndent: '30px',
                                 backgroundImage: `repeating-linear-gradient(${backgroundColour}, ${backgroundColour} 16.15px, #9198e5 17.15px, #9198e5 18.15px)`,
+                                whiteSpace: 'pre-wrap',
                             }}
                         >
                             {reviewCard.content}
                         </div>
                     </div>
                     <div>
-                        {reviewSections ? (
+                        {reviewSections.length !== 0 ? (
                             <ReviewCards
                                 reviewSections={reviewSections}
                                 deleteReviewSection={deleteReviewSection}
@@ -201,17 +215,14 @@ function SubmissionReview({
                         ) : (
                             <div></div>
                         )}
+                        {reviewSections.length !== 0 ? (
+                            <button onClick={handleSubmit}>Submit review</button>
+                        ) : (
+                            <div></div>
+                        )}
                     </div>
                 </div>
             )
-            /*} else {
-            const style = { width: '350px', backgroundColor: backgroundColour }
-            return (
-                <div className="ignore-click" style={style}>
-                    <div>{reviewCard.content}</div>
-                    <div onClick={() => handleSelected()}>EXPAND</div>
-                </div>
-            )*/
         }
     } else {
         return (
@@ -245,6 +256,7 @@ function DraggableCard({ backgroundColour, defaultPosision, content, handleSelec
                 <div style={{ height: '40px', backgroundColor: backgroundColour }}></div>
                 <div
                     style={{
+                        whiteSpace: 'pre-wrap',
                         padding: '0px 20px 0px',
                         textIndent: '30px',
                         backgroundImage: `repeating-linear-gradient(${backgroundColour}, ${backgroundColour} 16px, #9198e5 17px, #9198e5 18px)`,
@@ -285,7 +297,7 @@ function ReviewInput({
                     backgroundImage: `repeating-linear-gradient(${backgroundColour}, ${backgroundColour} 16.15px, #9198e5 17.15px, #9198e5 18.15px)`,
                 }}
             >
-                <div style={{ fontStyle: 'italic' }}>"{highlight}"</div>
+                <div style={{ fontStyle: 'italic', whiteSpace: 'pre-wrap' }}>"{highlight}"</div>
                 <textarea value={reviewContent} onChange={(e) => handleReviewUpdate(e.target.value)} />
                 <button onClick={() => submitReview()}>Submit review</button>
             </div>
@@ -294,7 +306,7 @@ function ReviewInput({
 }
 
 type ReviewCardsProps = {
-    reviewSections: { quote: string; reviewContent: string }[]
+    reviewSections: ReviewSection[]
     deleteReviewSection: (index: number) => void
     backgroundColour: string
 }
@@ -317,7 +329,7 @@ function ReviewCards({ reviewSections, deleteReviewSection, backgroundColour }: 
                     >
                         <div style={{ fontStyle: 'italic' }}>"{content.quote}"</div>
                         <div style={{ height: '20px' }}></div>
-                        <div>{content.reviewContent}</div>
+                        <div style={{ whiteSpace: 'pre-wrap' }}>{content.content}</div>
                     </div>
                     <button onClick={() => deleteReviewSection(index)}>Remove</button>
                 </div>

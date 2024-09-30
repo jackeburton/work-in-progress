@@ -13,30 +13,26 @@ function initReviewCards(submissionsToReview: Submission[]): ReviewCard[] {
 export function useReviewCards(submissionsToReview: Submission[]) {
     const [reviewCards, setReviewCards] = useState(initReviewCards(submissionsToReview))
 
-    const updateIndex = useCallback((index: number, updates: Partial<ReviewCard>) => {
-        setReviewCards((prevCards) =>
-            prevCards.map((reviewCard, innerIndex) =>
-                innerIndex === index ? { ...reviewCard, ...updates } : reviewCard
-            )
-        )
+    const removeId = useCallback((submissionId: number) => {
+        setReviewCards((prevCards) => prevCards.filter((card) => card.id !== submissionId))
     }, [])
 
-    const setIndexSelected = useCallback((index: number) => {
+    const setIdSelected = useCallback((submissionId: number) => {
         setReviewCards((prevCards) =>
-            prevCards.map((reviewCard, innerIndex) =>
-                innerIndex === index ? { ...reviewCard, selected: true } : { ...reviewCard, selected: false }
+            prevCards.map((reviewCard) =>
+                reviewCard.id === submissionId ? { ...reviewCard, selected: true } : { ...reviewCard, selected: false }
             )
         )
     }, [])
 
     const setNoneSelected = useCallback(() => {
-        setReviewCards(reviewCards.map((reviewCard) => ({ ...reviewCard, selected: false })))
+        setReviewCards((prevCards) => prevCards.map((reviewCard) => ({ ...reviewCard, selected: false })))
     }, [])
 
     return {
         reviewCards,
-        updateIndex,
-        setIndexSelected,
+        removeId,
+        setIdSelected,
         setNoneSelected,
     }
 }

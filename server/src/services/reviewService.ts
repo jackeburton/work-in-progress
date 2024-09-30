@@ -1,16 +1,27 @@
 import client from '../db'
-import { Review } from '../models/reviewModel'
+import { Review, ReviewSection } from '../models/reviewModel'
 import { getMultiplyById, getSingleById } from '../utils'
 
 export async function createReview(review: Review): Promise<Review> {
-    const queryString = 'INSERT INTO reviews (userId, submissionId, content) VALUES ($1, $2, $3) RETURNING *'
+    const reviewSectionQueryString =
+        'INSERT INTO reviewSections (reviewId, quote, content) VALUES ($1, $2, $3) RETURNING *'
+    const reviewQueryString = 'INSERT INTO reviews (userId, submissionId) VALUES ($1, $2) RETURNING *'
 
     try {
-        const result = await client.query(queryString, [review.userId, review.submissionId, review.content])
-        const createReview = result.rows[0]
-        return new Review(createReview.user_id, createReview.submission_id, createReview.content, createReview.id)
+        const result = await client.query(reviewQueryString, [review.userId, review.submissionId])
+        const dbReview = result.rows[0]
+        const objReviewSections: ReviewSection[] = []
+        for (const reviewSection of review.reviewSections) {
+            const result = await client.query(reviewSectionQueryString, [
+                dbReview.id,
+                reviewSection.quote,
+                reviewSection.id,
+            ])
+            const dbReviewSection = result.rows[0]
+            objReviewSections.push(new ReviewSection(dbReview.id, dbReviewSection.quote, dbReviewSection.content))
+        }
+        return new Review(dbReview.userId, dbReview.submissionId, objReviewSections)
     } catch (error) {
-        console.log(queryString)
         console.error('Issue inserting into db', error)
         throw new Error('Database operation failed')
     }

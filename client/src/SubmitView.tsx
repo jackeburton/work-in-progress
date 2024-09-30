@@ -13,7 +13,6 @@ const submit = async (submission: SubmittingSubmission) => {
             content: submission.content,
         },
     })
-    console.log(response)
     return response.data
 }
 

@@ -19,7 +19,6 @@ export const authenticateJWT = (req: Request, res: Response, next: Function) => 
 
     jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: any) => {
         if (err) return res.sendStatus(403)
-        console.log(user)
         req.user = user as User
         next()
     })
