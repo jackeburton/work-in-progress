@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { ReviewCard, Submission } from './types/UserInfo'
+import { ReviewCard, Submission } from '../types/UserInfo'
 
 function initReviewCards(submissionsToReview: Submission[]): ReviewCard[] {
     return submissionsToReview.map((submission) => ({

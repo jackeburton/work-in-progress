@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { ReviewCard, ReviewSection, SubmittingReview } from './types/UserInfo'
-import axios from 'axios'
+import { ReviewCard, ReviewSection, SubmittingReview } from '../types/UserInfo'
+import DraggableCard from './DraggableCard'
+import ReviewCards from './ReviewCards'
+import ReviewInput from './ReviewInput'
 import { useQuery } from '@tanstack/react-query'
-import Draggable from 'react-draggable'
-import { colours } from './types/Colours'
-import { useLogin } from './LoginContext'
-import { useReviewCards } from './useReviewCards'
-import './reviewViewStyle.css'
+import axios from 'axios'
+import { colours } from '../types/Colours'
 
 const submitReview = async (review: SubmittingReview) => {
     console.log(review)
@@ -28,50 +27,6 @@ function randomColour(seed: number): string {
     return colours[Math.floor(random * colours.length)]
 }
 
-const getOffset = (): number => {
-    return Math.floor(Math.random() * 10)
-}
-
-const reviewCoords = [
-    { x: 150 + getOffset(), y: 100 + getOffset() },
-    { x: 600 + getOffset(), y: 100 + getOffset() },
-    { x: 250 + getOffset(), y: 300 + getOffset() },
-]
-
-function ReviewView() {
-    const { submissionsToReview, user } = useLogin()
-    if (submissionsToReview === null) {
-        return <div>you have no new submissions to review</div>
-    }
-    const { reviewCards, removeId, setIdSelected, setNoneSelected } = useReviewCards(submissionsToReview)
-
-    useEffect(() => {
-        console.log(reviewCards)
-    }, [reviewCards])
-
-    return (
-        <div>
-            {reviewCards
-                .filter((submission) => submission.reviewSent === false)
-                .map((submission, index) => (
-                    <SubmissionReview
-                        key={submission.id}
-                        reviewCard={submission}
-                        coords={reviewCoords[index]}
-                        anySelected={reviewCards.some((reviewCard) => reviewCard.selected)}
-                        userId={user.id}
-                        handleDeselectAll={setNoneSelected}
-                        handleSelected={() => setIdSelected(submission.id)}
-                        handleReviewSentUpdate={() => {
-                            removeId(submission.id)
-                        }}
-                    />
-                ))}
-        </div>
-    )
-}
-
-export default ReviewView
 type SubmissionReviewNewProps = {
     userId: number
     reviewCard: ReviewCard
@@ -236,104 +191,4 @@ function SubmissionReview({
     }
 }
 
-type DraggableCardProps = {
-    backgroundColour: string
-    defaultPosision: { x: number; y: number }
-    content: string
-    handleSelected: () => void
-}
-
-function DraggableCard({ backgroundColour, defaultPosision, content, handleSelected }: DraggableCardProps) {
-    const nodeRef = useRef(null)
-    const style = {
-        width: '350px',
-        fontFamily: 'Courier prime',
-        fontWeight: '400',
-    }
-    return (
-        <Draggable nodeRef={nodeRef} defaultPosition={defaultPosision}>
-            <div ref={nodeRef} style={style}>
-                <div style={{ height: '40px', backgroundColor: backgroundColour }}></div>
-                <div
-                    style={{
-                        whiteSpace: 'pre-wrap',
-                        padding: '0px 20px 0px',
-                        textIndent: '30px',
-                        backgroundImage: `repeating-linear-gradient(${backgroundColour}, ${backgroundColour} 16px, #9198e5 17px, #9198e5 18px)`,
-                    }}
-                >
-                    {content.slice(0, 300)}...
-                </div>
-                <div style={{ height: '40px', backgroundColor: backgroundColour }} onClick={() => handleSelected()}>
-                    EXPAND
-                </div>
-            </div>
-        </Draggable>
-    )
-}
-
-type ReviewInputProps = {
-    highlight: string
-    reviewContent: string
-    handleReviewUpdate: (content: string) => void
-    submitReview: () => void
-    backgroundColour: string
-}
-
-function ReviewInput({
-    highlight,
-    reviewContent,
-    handleReviewUpdate,
-    submitReview,
-    backgroundColour,
-}: ReviewInputProps) {
-    return (
-        <div style={{ backgroundColor: backgroundColour, boxShadow: '10px 10px 5px' }}>
-            <div style={{ height: '40px' }}></div>
-            <div
-                style={{
-                    padding: '0px 30px 0px',
-                    textIndent: '30px',
-                    backgroundImage: `repeating-linear-gradient(${backgroundColour}, ${backgroundColour} 16.15px, #9198e5 17.15px, #9198e5 18.15px)`,
-                }}
-            >
-                <div style={{ fontStyle: 'italic', whiteSpace: 'pre-wrap' }}>"{highlight}"</div>
-                <textarea value={reviewContent} onChange={(e) => handleReviewUpdate(e.target.value)} />
-                <button onClick={() => submitReview()}>Submit review</button>
-            </div>
-        </div>
-    )
-}
-
-type ReviewCardsProps = {
-    reviewSections: ReviewSection[]
-    deleteReviewSection: (index: number) => void
-    backgroundColour: string
-}
-
-function ReviewCards({ reviewSections, deleteReviewSection, backgroundColour }: ReviewCardsProps) {
-    return (
-        <div>
-            {reviewSections.map((content, index) => (
-                <div
-                    style={{ backgroundColor: backgroundColour, boxShadow: '10px 10px 5px', marginBottom: '20px' }}
-                    key={index}
-                >
-                    <div style={{ height: '40px' }}></div>
-                    <div
-                        style={{
-                            padding: '0px 30px 0px',
-                            textIndent: '30px',
-                            backgroundImage: `repeating-linear-gradient(${backgroundColour}, ${backgroundColour} 16.15px, #9198e5 17.15px, #9198e5 18.15px)`,
-                        }}
-                    >
-                        <div style={{ fontStyle: 'italic' }}>"{content.quote}"</div>
-                        <div style={{ height: '20px' }}></div>
-                        <div style={{ whiteSpace: 'pre-wrap' }}>{content.content}</div>
-                    </div>
-                    <button onClick={() => deleteReviewSection(index)}>Remove</button>
-                </div>
-            ))}
-        </div>
-    )
-}
+export default SubmissionReview
