@@ -21,7 +21,7 @@ export const LoginProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const checkLogin = () => {
     const context = useContext(LoginContext)
-    return context !== null
+    return context !== undefined
 }
 
 export const useLogin = () => {
