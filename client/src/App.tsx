@@ -1,11 +1,11 @@
 import { Routes, Route } from 'react-router-dom'
-import SubmissionView from './SubmissionView'
 import ReviewView from './reviewView/ReviewView'
-import SubmitView from './SubmitView'
+import SubmitView from './submitView/SubmitView'
 import LoginGoogle from './LoginGoogle'
 import Header from './Header'
 import { checkLogin, LoginProvider } from './LoginContext'
 import { colours } from './types/Colours'
+import SubmissionView from './SubmissionView'
 
 export default function App() {
     return (
