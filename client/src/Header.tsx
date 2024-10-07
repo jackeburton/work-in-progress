@@ -1,8 +1,10 @@
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
+import HeaderItem from './HeaderItem'
 
 type PathInfo = {
     path: string
     label: string
+    colour: string
 }
 
 type HeaderProps = { pathInfos: PathInfo[] }
@@ -12,53 +14,29 @@ function Header({ pathInfos }: HeaderProps) {
     console.log(pathname)
     return (
         <div>
-            <div className="ignore-click">
-                {pathInfos.map((pathInfo, index) => {
-                    if (pathname === pathInfo.path) {
-                        return (
-                            <Link key={index} to={pathInfo.path}>
-                                <div style={{ display: 'inline-block', overflow: 'hidden' }}>
-                                    {pathInfo.label}{' '}
-                                    <div
-                                        style={{
-                                            width: '40px',
-                                            height: '100%',
-                                            transform: 'rotate(50deg)',
-                                            display: 'inline-block',
-                                            backgroundColor: 'green',
-                                        }}
-                                    >
-                                        &nbsp;
-                                    </div>
-                                </div>
-                            </Link>
-                        )
-                    } else {
-                        return (
-                            <Link key={index} to={pathInfo.path}>
-                                <div style={{ display: 'inline-block', overflow: 'hidden' }}>
-                                    {pathInfo.label}{' '}
-                                    <div
-                                        style={{
-                                            width: '40px',
-                                            height: '100%',
-                                            transform: 'rotate(50deg)',
-                                            display: 'inline-block',
-                                            backgroundColor: 'green',
-                                        }}
-                                    >
-                                        &nbsp;
-                                    </div>
-                                </div>
-                            </Link>
-                        )
-                    }
-                })}
+            <div className="ignore-click" style={{ position: 'relative', width: '100%' }}>
+                {pathInfos.map((pathInfo, index) =>
+                    pathInfo.path === pathname ? (
+                        <HeaderItem
+                            key={index}
+                            selected={true}
+                            label={pathInfo.label}
+                            path={pathInfo.path}
+                            colour={pathInfo.colour}
+                        />
+                    ) : (
+                        <HeaderItem
+                            key={index}
+                            selected={false}
+                            label={pathInfo.label}
+                            path={pathInfo.path}
+                            colour={pathInfo.colour}
+                        />
+                    )
+                )}
             </div>
 
-            <div>
-                <Outlet />
-            </div>
+            <Outlet />
         </div>
     )
 }

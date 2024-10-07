@@ -5,7 +5,7 @@ import ReviewCards from './ReviewCards'
 import ReviewInput from './ReviewInput'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
-import { colours } from '../types/Colours'
+import { randomColour } from '../utils'
 
 const submitReview = async (review: SubmittingReview) => {
     console.log(review)
@@ -19,12 +19,6 @@ const submitReview = async (review: SubmittingReview) => {
         },
     })
     return response.data
-}
-
-function randomColour(seed: number): string {
-    var x = Math.sin(seed) * 10000
-    var random = x - Math.floor(x)
-    return colours[Math.floor(random * colours.length)]
 }
 
 type SubmissionReviewNewProps = {
