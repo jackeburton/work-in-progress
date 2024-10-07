@@ -1,3 +1,5 @@
+import { ReviewSection } from '../types/UserInfo'
+
 type ReviewCardsProps = {
     reviewSections: ReviewSection[]
     deleteReviewSection: (index: number) => void

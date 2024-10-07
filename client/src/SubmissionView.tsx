@@ -1,13 +1,17 @@
 import { useLogin } from './LoginContext'
 import { Review, SubmissionWithReviews } from './types/UserInfo'
 
-function SubmissionsView() {
+type Props = {
+    colour: string
+}
+
+function SubmissionsView({ colour }: Props) {
     const { submissionsWithReviews } = useLogin()
     if (submissionsWithReviews === null) {
         ;<div>you have no submissions with reivews</div>
     } else {
         return (
-            <div>
+            <div style={{ backgroundColor: colour }}>
                 {submissionsWithReviews.map((submissionWithReviews: SubmissionWithReviews) => {
                     return (
                         <div key={submissionWithReviews.submission.id}>

@@ -16,7 +16,11 @@ const submit = async (submission: SubmittingSubmission) => {
     return response.data
 }
 
-function SubmitView() {
+type Props = {
+    colour: string
+}
+
+function SubmitView({ colour }: Props) {
     const { user } = useLogin()
     const [submissionSent, setSubmissionSent] = useState(false)
     const [submission, setSubmission] = useState<SubmittingSubmission>({ userId: user.id, content: '' })
@@ -34,7 +38,7 @@ function SubmitView() {
         return <div>error submitting</div>
     }
     return (
-        <div>
+        <div style={{ backgroundColor: colour }}>
             <textarea
                 disabled={submissionSent}
                 value={submission.content}

@@ -14,7 +14,10 @@ const reviewCoords = [
     { x: 250 + getOffset(), y: 300 + getOffset() },
 ]
 
-function ReviewView() {
+type Props = {
+    colour: string
+}
+function ReviewView({ colour }: Props) {
     const { submissionsToReview, user } = useLogin()
     if (submissionsToReview === null) {
         return <div>you have no new submissions to review</div>
@@ -26,7 +29,7 @@ function ReviewView() {
     }, [reviewCards])
 
     return (
-        <div>
+        <div style={{ backgroundColor: colour, height: '1000px' }}>
             {reviewCards
                 .filter((submission) => submission.reviewSent === false)
                 .map((submission, index) => (
