@@ -1,6 +1,6 @@
 # work-in-progress
 
-A fullstack application for constructive reviewing in short story writing
+A full stack application for constructive reviewing in short story writing
 
 Technologies:
 
